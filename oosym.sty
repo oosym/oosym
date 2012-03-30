@@ -1,0 +1,134 @@
+%%
+%% This is file `oosym.sty',
+%%
+\NeedsTeXFormat{LaTeX2e} \ProvidesPackage{oosym}
+\RequirePackage{xparse}
+
+\ExplSyntaxOn
+\tl_new:N \g_oosym_subs_tl {}
+\tl_new:N \g_oosym_subsep_tl {}
+\tl_new:N \g_oosym_sups_tl {}
+\tl_new:N \g_oosym_supsep_tl {}
+\clist_clear_new:N \g_oosym_varcmd_clist
+\clist_clear_new:N \g_oosym_symcmd_clist
+
+\NewDocumentCommand \oosymaddvarcmd { m }
+   { \clist_gput_right:Nn \g_oosym_varcmd_clist {#1} }
+   
+\NewDocumentCommand \oosymaddsymcmd { m }
+   { \clist_gput_right:Nn \g_oosym_symcmd_clist {#1} }
+
+\NewDocumentCommand \oosymapplyvarcmd { m }
+   {
+     \tl_clear:N \l_oosym_tmpa_tl {}
+     \tl_set:Nn \l_oosym_tmpa_tl {#1}
+     \clist_map_inline:Nn \g_oosym_varcmd_clist
+       {
+         \tl_set:Nx \l_oosym_tmpa_tl
+           { \exp_not:c {##1} { \exp_not:V \l_oosym_tmpa_tl } }  
+       }
+     \tl_use:N \l_oosym_tmpa_tl  
+     \clist_gclear:N \g_oosym_varcmd_clist {}  %clear after use
+   }
+\NewDocumentCommand \oosymapplysymcmd { m }
+   {
+     \tl_clear:N \l_oosym_tmpa_tl {}
+     \tl_set:Nn \l_oosym_tmpa_tl {#1}
+     \clist_map_inline:Nn \g_oosym_symcmd_clist
+       {
+         \tl_set:Nx \l_oosym_tmpa_tl
+           { \exp_not:c {##1} { \exp_not:V \l_oosym_tmpa_tl } }  
+       }
+     \tl_use:N \l_oosym_tmpa_tl  
+     \clist_gclear:N \g_oosym_symcmd_clist {}  %clear after use
+   }   
+   
+\NewDocumentCommand{\oosymaddtosubs}{ m }
+  {
+     \tl_put_right:Nx \g_oosym_subs_tl { \g_oosym_subsep_tl } 
+     \tl_put_right:Nn \g_oosym_subs_tl { #1 } 
+		 \tl_set:Nn \g_oosym_subsep_tl {,}
+  }
+\NewDocumentCommand{\oosymaddtosups}{ m }
+  {
+     \tl_put_right:Nx \g_oosym_sups_tl { \g_oosym_supsep_tl } 
+     \tl_put_right:Nn \g_oosym_sups_tl { #1 } 
+		 \tl_set:Nn \g_oosym_supsep_tl {,}
+  }
+\NewDocumentCommand{\oosymprintsubs}{ }
+  {
+   \tl_use:N \g_oosym_subs_tl
+   \tl_gclear:N \g_oosym_subs_tl {}
+	 \tl_gset:Nn \g_oosym_subsep_tl {} 	 %clear after use
+  }
+\NewDocumentCommand{\oosymprintsups}{ }
+  {
+   \tl_use:N \g_oosym_sups_tl
+   \tl_gclear:N \g_oosym_sups_tl {}
+   \tl_gset:Nn \g_oosym_supsep_tl {}  %clear after use
+  }
+\ExplSyntaxOff
+
+%Note: All var only commands (like hat and other math accent commands) has to be definied, else they are used as sym commands
+\def\oosymopvarX#1{op?{#1}}
+
+%mathaccents
+\def\oosymopvarm#1{\bar{#1}}
+\def\oosymopvard#1{\dot{#1}}
+\def\oosymopvardd#1{\ddot{#1}}
+\def\oosymopvarddd#1{\dddot{#1}}
+\def\oosymopvarhat#1{\hat{#1}}
+\def\oosymopvartilde#1{\tilde{#1}}
+\def\oosymopvarbreve#1{\breve{#1}}
+
+%
+\def\oosymopvarv#1{\vec{#1}}	%Vector
+\def\oosymopvarM#1{\mathbf{\uppercase{#1}}} %Matrix
+\def\oosymopvarT#1{\mathbf{\uppercase{#1}}} %Tensor same as matrix, but maybe someone what is another way
+\def\oosymopvarR#1{\mathbb{\uppercase{#1}}} %number range/type
+\def\oosymopvarQ#1{\mathcal{\uppercase{#1}}} %Set
+
+\def\oosymopvaru#1{\operationunit{#1}} %Use u to show symbols unit, but maybe redefinied by user for other use
+\def\oosymopvarunit#1{\expandafter\csname #1unit\endcsname\relax} %use unit to show symbols unit
+
+\def\oosymopsymt#1{{#1}^{T}} %Transpose is an sym command -> apply to var with all indices!
+\def\oosymopsymabs#1{\left|#1\right|} %abs |x|
+\def\oosymopsymnorm#1{\left\|#1\right\|} %Norm ||x||
+
+%log means log_10
+\def\oosymopsymlog#1{\log_{10} #1}
+%logb means log_2
+\def\oosymopsymlogb#1{\log_{2} #1}
+
+\DeclareDocumentCommand \oosymsymbol { s > { \SplitList {,} } d<> > { \SplitList {,} } o > { \SplitList {,} } o m > { \SplitList {,} } o > { \SplitList {,} } o}
+{
+\IfBooleanTF #1%
+	{\oosymaddvarcmd{oosymopvarv}}%
+	{}%
+%
+\IfNoValueTF {#3}%
+	{}{\ProcessList {#3} { \oosymsymbolarg }}%
+\IfNoValueTF {#4}%
+	{}{\ProcessList {#4} { \oosymsymbolargsup }}%
+\IfNoValueTF {#6}%
+	{}{\ProcessList {#6} { \oosymsymbolarg }}%
+\IfNoValueTF {#7}%
+	{}{\ProcessList {#7} { \oosymsymbolargsup }}%
+\IfNoValueTF {#2}%
+	{}{\ProcessList {#2} { \oosymcmds }}%
+%
+	\oosymapplysymcmd{\oosymapplyvarcmd{{#5}}_{\oosymprintsubs}^{\oosymprintsups}}
+}
+
+
+\DeclareDocumentCommand \oosymcmds { m }
+{\@ifundefined{oosymopvar#1}{\@ifundefined{oosymopsym#1}{\@ifundefined{#1}{\oosymaddvarcmd{\boldsymbol{<#1>?}}}{ \oosymaddsymcmd{#1}}}{\oosymaddsymcmd{oosymopsym#1}}}{\oosymaddvarcmd{oosymopvar#1}}}
+
+\DeclareDocumentCommand \oosymsymbolarg { m }
+{\IfNoValueTF {#1}{}{\@ifundefined{ind#1}{\oosymaddtosubs{#1}}{\@ifundefined{ind#1issub}{\@ifundefined{ind#1issup}{\oosymaddtosubs{#1}}{\oosymaddtosups{\csname ind#1\endcsname}}}{\oosymaddtosubs{\csname ind#1\endcsname}}}}}
+
+\DeclareDocumentCommand \oosymsymbolargsup { m }
+{\IfNoValueTF {#1}{}{\@ifundefined{ind#1}{\oosymaddtosups{#1}}{\oosymaddtosups{\csname ind#1\endcsname}}}}
+\endinput
+%%
+%% End of file `oosym.sty'.

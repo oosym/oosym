@@ -1,0 +1,66 @@
+\documentclass{article}
+\usepackage{oosym}
+\usepackage{amsmath,amssymb}
+
+\DeclareDocumentCommand \newxsym { o o r() m} { 
+	\DeclareDocumentCommand #4 { s d<> o o} { 
+	\IfBooleanTF ##1%
+		{\oosymsymbol*[#1][#2]{#3}[##3][##4]} 
+		{\IfNoValueTF {##2}%
+			{\oosymsymbol[#1][#2]{#3}[##3][##4]}
+			{\oosymsymbol<##2>[#1][#2]{#3}[##3][##4]}
+		} 
+	}
+}
+
+\def\abs#1{\left|#1\right|}
+
+\def\indelectric{\text{el}}
+\def\indelectricissub{true}
+
+\def\indoptimal{*}
+\def\indoptimalissub{true}
+
+\def\indcurrentstep{k}
+\def\indcurrentstepissub{true}
+
+\newxsym(t){\xsymtest} %New symbol
+
+\begin{document}
+$\xsymtest<norm,d>[electric][2,3,4]$\\
+$\xsymtest<v>[electric,\indcurrentstep+1]$\\
+$t:\xsymtest\neq\xsymtest<M>\neq\xsymtest<Q>[4]$\\
+$\vec{t}:\xsymtest*$\\
+%$? t:\xsymtest<x>$\\ Not working yet!
+$\left|t_3\right|:\xsymtest<abs>[3]$\\
+$\left|\vec{t_4}\right|:\xsymtest<v,abs>[4]$\\
+$\left\|\vec{\dot{t}}_4\right\|=\xsymtest<v,d,norm>[4]$\\
+$\left\|t_{i,j}\right\|:\xsymtest<norm>[i,j]$\\
+$\dot{t}_{i,j}:\xsymtest<d>[i,j]$\\
+$\ddot{t}_{i,j}:\xsymtest<dd>[i,j]$\\
+$\bar{t}_{i,j}:\xsymtest<m>[i,j]$\\
+$\hat{t}_{i,j}:\xsymtest<hat>[i,j]$\\
+$\ln t_{i,j}^{2}:\xsymtest<ln>[i,j][2]$\\
+$\log t_{i,j}^{2}:\xsymtest<log>[i,j][2]$\\
+$\log2 t_{i,j}^{2}:\xsymtest<logb>[i,j][2]$\\
+$\exp t_{i,j}^{2}:\xsymtest<exp>[i,j][2]$\\
+$\sin t_{i,j}^{2}:\xsymtest<sin>[i,j][2]$\\
+$\cos t_{i,j}^{2}:\xsymtest<cos>[i,j][2]$\\
+$\sinh t:\xsymtest<sinh>[i,j][2]$\\
+$\mathbb{\uppercase{t}}_{i,j}^{2}:\xsymtest<R>[i,j][2]$\\
+$\sqrt{t_{i,j}^{2}}:\xsymtest<sqrt>[i,j][2]$\\
+$\approx t_{i,j}^{2}:\xsymtest<approx>[i,j][2]$\\
+$\nabla t_{i,j}^{2}:\xsymtest<nabla>[i,j][2]$\\
+$\xsymtest<M>(x)$\\ %Eine Matrix
+$\xsymtest<v>[electric,optimal,i]$\\ %Ein Vektor
+$\xsymtest<t>[electric,optimal,i]$\\ %transponiert
+%$\xsymtest<T>[electric,optimal,i]{\sympower}$\\ %Tensor
+$\xsymtest<Q>[k,electric,optimal,i]$\\ %Eine Menge
+$\xsymtest*[electric,optimal,i]$\\
+$\xsymtest*[electric,optimal,i_1][4,sup^2]$\\ %Additional superscript + Doublesub i_1
+$\xsymtest[][5](x)$\\
+
+Extended command:
+\newxsym(\xsymtest<v>[electric][2,4,6]){\xxsymtest} %Extended definition
+$\xxsymtest<abs>[optimal][i]$\\
+\end{document}
